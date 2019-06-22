@@ -2,9 +2,6 @@
 
 {% block content %}
 
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Обновить">
-</form>
+{% include "invoice/components/basicForm.html" with form=form submit_text="Обновить" %}
 
 {% endblock %}

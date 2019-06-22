@@ -1,5 +1,6 @@
 black
 django>=2.2.2
+django-widget-tweaks
 flake8
 flake8-import-order
 tox
