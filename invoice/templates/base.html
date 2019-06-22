@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Накладные</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://use.fontawesome.com/releases/v5.9.0/js/all.js" data-auto-replace-svg="nest"></script>
+        <script>
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            function csrfSafeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", jQuery("[name=csrfmiddlewaretoken]").val() ? jQuery("[name=csrfmiddlewaretoken]").val():getCookie('csrftoken'));
+                    }
+                }
+            });
+
+            function delete_invoice(id) {
+                var url = "{% url 'invoice:index' %}";
+
+                $.ajax({
+                    url: url+id,
+                    type: 'DELETE',
+                    success: function(result) {
+                        window.location.href = "{% url 'invoice:index' %}";
+                    }
+                });
+            }
+
+            function delete_released(id, invoice_id) {
+                var url = "/released/";
+
+                $.ajax({
+                    url: url+id,
+                    type: 'DELETE',
+                    success: function(result) {
+                        window.location.href = "{% url 'invoice:index' %}" + invoice_id;
+                    }
+                });
+            }
+
+            function clear_params() {
+                document.getElementById('filter_month').value = "";
+                set_query_params();
+            }
+
+            function load_query_params() {
+                if (document.getElementById('filter_month')){
+                    var searchParams = new URLSearchParams(window.location.search);
+                    var year = searchParams.get('filter_year');
+                    var month = searchParams.get('filter_month');
+                    if (year && month){
+                    document.getElementById('filter_month').value = year + '-' + month;
+                    }
+                }
+            }
+
+            function set_query_params() {
+                var searchParams = new URLSearchParams(window.location.search);
+                searchParams.delete('filter_year');
+                searchParams.delete('filter_month');
+                var values = document.getElementById('filter_month').value.split('-');
+                if (values[0] !== ''){
+                    searchParams.set('filter_year', values[0]);
+                    searchParams.set('filter_month', values[1]);
+                }
+                window.location.search = searchParams.toLocaleString();
+            }
+
+            window.onload = function() {
+               load_query_params();
+            }
+        </script>
+    </head>
+
+    <body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#"><i class="fas fa-file-invoice text-primary"></i> inVoice</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/">Главная</a>
+              </li>
+              {% block breadcrumb %}{% endblock breadcrumb %}
+            </ul>
+            {% block navbar_addition %}{% endblock navbar_addition %}
+          </div>
+        </nav>
+    {% block content %}{% endblock content %}
+    </div>
+    </body>
+</html>

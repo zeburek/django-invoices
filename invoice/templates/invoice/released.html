@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Отпущено:</h1>
+    <p>
+        <br />Накладная: {{ released.invoice }}
+        <br />Наименование: {{ released.product.name }}
+        <br />Количество: {{ released.qty }}
+    </p>
+
+{% endblock %}

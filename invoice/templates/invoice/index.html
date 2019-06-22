@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+
+{% block navbar_addition %}
+
+<form class="form-inline my-2 my-lg-0 float-right">
+        <small class="mr-2" id="filter-addon">Фильтр</small>
+        <input class="form-control form-control-sm" aria-describedby="filter-addon" type="month" id="filter_month" placeholder="Месяц" style="width:150px;"/>
+        <button class="btn btn-sm btn-outline-success" onclick="set_query_params()" type="button">Применить</button>
+        <button class="btn btn-sm btn-outline-warning" onclick="clear_params()" type="button">Очистить</button>
+</form>
+
+{% endblock navbar_addition %}
+
+{% block content %}
+
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+    <div class="accordion my-2 w-50 mx-auto border-bottom" id="accordionAdding">
+        {% include "invoice/components/addingInvoiceForm.html" %}
+    </div>
+
+    <p>Общая сумма: {{ sum_summary }}</p>
+
+    <ul class="nav nav-tabs" id="mainPageTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="main-list-tab" data-toggle="tab" href="#main-list" role="tab" aria-controls="home" aria-selected="true">Список накладных</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="products-tab" data-toggle="tab" href="#products" role="tab" aria-controls="profile" aria-selected="false">Продукция</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="clients-tab" data-toggle="tab" href="#clients" role="tab" aria-controls="contact" aria-selected="false">Клиенты</a>
+      </li>
+    </ul>
+
+    <div class="tab-content p-2 border-left border-right border-bottom" id="mainPageTabsContent">
+
+        <div class="tab-pane fade show active" id="main-list" role="tabpanel" aria-labelledby="main-list-tab">
+            <div class="list-group">
+            {% for invoice in invoices %}
+
+                {% include "invoice/components/deleteInvoiceModal.html" with invoice=invoice %}
+                <div class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100">
+                        <a href="{% url 'invoice:details' invoice.id %}" class="mr-auto">
+                            <h5 class="mb-0">Накладная {{ invoice.number }}</h5>
+                        </a>
+                        <small class="float-right mr-2">От {{ invoice.date }}</small>
+                        <a href="{% url 'invoice:edit_invoice' invoice.id %}"><i class="fas fa-pen float-right text-warning"></i></a>
+                        <a href="#" data-toggle="modal" data-target="#deleteInvoiceModal{{ invoice.id }}"><i class="far fa-times-circle float-right text-danger"></i></a>
+                    </div>
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-0">Кол-во: {{ invoice.sum_qty }}, Сумма: {{ invoice.sum_summary }}</p>
+                        <small>Для {{ invoice.client }}</small>
+                    </div>
+                </div>
+            {% empty %}
+            Нет добавленных накладных.
+            {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
+            <table class="table table-sm table-bordered table-hover">
+                <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Наименование</th>
+                    <th>Обшее кол-во</th>
+                    <th>Общая сумма</th>
+                </tr>
+                </thead>
+        {% for product in products_summary %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.sum_qty }}</td>
+                    <td>{{ product.sum_summary }}</td>
+                </tr>
+        {% empty %}
+                <tr><td colspan="4">Недостаточно информации</td></tr>
+        {% endfor %}
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="clients" role="tabpanel" aria-labelledby="clients-tab">
+            <table class="table table-sm table-bordered table-hover">
+                <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Клиент</th>
+                    <th>Обшее кол-во</th>
+                    <th>Общая сумма</th>
+                    <th>Количество накладных</th>
+                </tr>
+                </thead>
+
+        {% for client in clients_summary %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.sum_qty }}</td>
+                    <td>{{ client.sum_summary }}</td>
+                    <td>{{ client.sum_invoices }}</td>
+                </tr>
+        {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
