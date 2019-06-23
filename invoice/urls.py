@@ -8,7 +8,9 @@ urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
     path("<int:pk>/", views.InvoiceDetailView.as_view(), name="details"),
     path(
-        "<int:pk>/edit", views.InvoiceEditFormView.as_view(), name="edit_invoice"
+        "<int:pk>/edit",
+        views.InvoiceEditFormView.as_view(),
+        name="edit_invoice",
     ),
     path(
         "released/<int:pk>/",

@@ -216,12 +216,12 @@ class ReleasedEditFormView(generic.UpdateView):
 class ReturnedCreateForm(forms.ModelForm):
     class Meta:
         model = Returned
-        fields = ['product', 'qty', 'discount', 'date', 'client']
+        fields = ["product", "qty", "discount", "date", "client"]
 
 
 class ReturnedCreateFormView(generic.CreateView):
     model = Returned
-    fields = ['product', 'qty', 'discount', 'date', 'client']
+    fields = ["product", "qty", "discount", "date", "client"]
 
     def get(self, request, *args, **kwargs):
         return HttpResponseRedirect(reverse("invoice:index"))
