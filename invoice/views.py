@@ -37,10 +37,19 @@ class IndexView(generic.View):
             filtered = [
                 rel for rel in all_released if rel.product.name == product.name
             ]
+            returns = returned.filter(product_id=product.id)
+            sum_summary = sum([i.summary for i in filtered])
+            sum_returned = sum([i.summary for i in returns])
+            sum_qty = sum([i.qty for i in filtered])
+            sum_returned_qty = sum([i.qty for i in returns])
             data = {
                 "name": product.name,
-                "sum_summary": sum([i.summary for i in filtered]),
-                "sum_qty": sum([i.qty for i in filtered]),
+                "sum_summary": sum_summary,
+                "sum_returned": sum_returned,
+                "sum_with_returned": sum_summary - sum_returned,
+                "sum_qty": sum_qty,
+                "sum_returned_qty": sum_returned_qty,
+                "sum_with_returned_qty": sum_qty - sum_returned_qty,
             }
             products_summary.append(data)
         clients_summary = []
@@ -48,10 +57,19 @@ class IndexView(generic.View):
             filtered = [
                 inv for inv in invoices if inv.client.name == client.name
             ]
+            returns = returned.filter(client_id=client.id)
+            sum_summary = sum([i.sum_summary for i in filtered])
+            sum_returned = sum([i.summary for i in returns])
+            sum_qty = sum([i.sum_qty for i in filtered])
+            sum_returned_qty = sum([i.qty for i in returns])
             data = {
                 "name": client.name,
-                "sum_summary": sum([i.sum_summary for i in filtered]),
-                "sum_qty": sum([i.sum_qty for i in filtered]),
+                "sum_summary": sum_summary,
+                "sum_returned": sum_returned,
+                "sum_with_returned": sum_summary - sum_returned,
+                "sum_qty": sum_qty,
+                "sum_returned_qty": sum_returned_qty,
+                "sum_with_returned_qty": sum_qty - sum_returned_qty,
                 "sum_invoices": len(filtered),
             }
             clients_summary.append(data)
@@ -198,12 +216,12 @@ class ReleasedEditFormView(generic.UpdateView):
 class ReturnedCreateForm(forms.ModelForm):
     class Meta:
         model = Returned
-        fields = ['product', 'qty', 'discount', 'date']
+        fields = ['product', 'qty', 'discount', 'date', 'client']
 
 
 class ReturnedCreateFormView(generic.CreateView):
     model = Returned
-    fields = ['product', 'qty', 'discount', 'date']
+    fields = ['product', 'qty', 'discount', 'date', 'client']
 
     def get(self, request, *args, **kwargs):
         return HttpResponseRedirect(reverse("invoice:index"))

@@ -62,6 +62,7 @@ class Released(models.Model):
 
 class Returned(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("released_product"))
+    client = models.ForeignKey(Client, default=None, on_delete=models.CASCADE, verbose_name=_("invoice_client"))
     qty = models.IntegerField(verbose_name=_("returned_qty"))
     discount = models.IntegerField(default=0, verbose_name=_("returned_discount"))
     date = models.DateField(verbose_name=_("returned_date"))
