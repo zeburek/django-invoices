@@ -1,0 +1,31 @@
+{% load widget_tweaks %}
+
+<div class="card">
+    <div class="card-header py-1" id="{{ collapse_name }}" data-toggle="collapse" data-target="#collapse{{ collapse_name }}" aria-expanded="true" aria-controls="collapseAddingInvoice">
+        {{ form_name }}
+    </div>
+
+    <div id="collapse{{ collapse_name }}" class="collapse" aria-labelledby="{{ collapse_name }}" data-parent="#accordionAdding">
+      <div class="card-body">
+        <form action="{{ url|default:"." }}" method="post">
+            <h5 class="card-title">{{ form_name }}</h5>
+            {% csrf_token %}
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field|add_class:"form-control" }}
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+                </div>
+            {% endfor %}
+            <input class="btn btn-primary" type="submit" value="{{ submit_text }}">
+        </form>
+      </div>
+    </div>
+</div>

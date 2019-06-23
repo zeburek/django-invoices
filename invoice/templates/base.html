@@ -48,6 +48,18 @@
                 });
             }
 
+            function delete_returned(id) {
+                var url = "{% url 'invoice:returned_create' %}";
+
+                $.ajax({
+                    url: url+id,
+                    type: 'DELETE',
+                    success: function(result) {
+                        window.location.href = "{% url 'invoice:index' %}";
+                    }
+                });
+            }
+
             function delete_released(id, invoice_id) {
                 var url = "/released/";
 

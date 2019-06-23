@@ -30,8 +30,8 @@ class Invoice(models.Model):
     number = models.IntegerField(verbose_name=_("invoice_number"))
     date = models.DateField(verbose_name=_("invoice_date"))
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name=_("invoice_client"))
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("invoice_created_at"))
-    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("invoice_updated_at"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created_at"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated_at"))
 
     def __str__(self):
         return f"{self.number} от {self.date} для {self.client}"
@@ -45,8 +45,8 @@ class Released(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("released_product"))
     qty = models.IntegerField(verbose_name=_("released_qty"))
     discount = models.IntegerField(default=0, verbose_name=_("released_discount"))
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("released_created_at"))
-    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("released_updated_at"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created_at"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated_at"))
 
     @property
     def summary(self):
@@ -58,3 +58,23 @@ class Released(models.Model):
 
     def __str__(self):
         return f"{self.product}  кол-во: {self.qty} скидка: {self.discount}%"
+
+
+class Returned(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("released_product"))
+    qty = models.IntegerField(verbose_name=_("returned_qty"))
+    discount = models.IntegerField(default=0, verbose_name=_("returned_discount"))
+    date = models.DateField(verbose_name=_("returned_date"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("created_at"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("updated_at"))
+
+    @property
+    def summary(self):
+        summary = self.product.price * self.qty
+        return summary - (summary * self.discount / 100)
+
+    def get_absolute_url(self):
+        return reverse("invoice:index")
+
+    def __str__(self):
+        return f"Возврат товара: {self.product}  кол-во: {self.qty} скидка: {self.discount}%"

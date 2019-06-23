@@ -8,7 +8,7 @@ urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
     path("<int:pk>/", views.InvoiceDetailView.as_view(), name="details"),
     path(
-        "<int:pk>/edit", views.InvoiceEditForm.as_view(), name="edit_invoice"
+        "<int:pk>/edit", views.InvoiceEditFormView.as_view(), name="edit_invoice"
     ),
     path(
         "released/<int:pk>/",
@@ -17,7 +17,17 @@ urlpatterns = [
     ),
     path(
         "released/<int:pk>/edit",
-        views.ReleasedEditForm.as_view(),
+        views.ReleasedEditFormView.as_view(),
         name="released_edit",
+    ),
+    path(
+        "returned/",
+        views.ReturnedCreateFormView.as_view(),
+        name="returned_create",
+    ),
+    path(
+        "returned/<int:pk>/",
+        views.ReturnedDetailView.as_view(),
+        name="returned_details",
     ),
 ]

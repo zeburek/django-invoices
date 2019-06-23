@@ -1,9 +1,10 @@
+from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 
-from .models import Client, Invoice, Product, Released
+from .models import Client, Invoice, Product, Released, Returned
 
 
 class IndexView(generic.View):
@@ -16,9 +17,13 @@ class IndexView(generic.View):
         if year and month:
             invoices = Invoice.objects.filter(
                 date__year=year, date__month=month
-            ).order_by("created_at")
+            ).order_by("-created_at")
+            returned = Returned.objects.filter(
+                date__year=year, date__month=month
+            ).order_by("-created_at")
         else:
             invoices = Invoice.objects.order_by("-created_at")
+            returned = Returned.objects.order_by("-created_at")
         clients = Client.objects.order_by("name")
         products = Product.objects.order_by("name")
         all_released = []
@@ -50,12 +55,19 @@ class IndexView(generic.View):
                 "sum_invoices": len(filtered),
             }
             clients_summary.append(data)
+        sum_summary = sum([i.sum_summary for i in invoices])
+        sum_returned = sum([i.summary for i in returned])
         context = {
             "invoices": invoices,
             "clients": clients,
-            "sum_summary": sum([i.sum_summary for i in invoices]),
+            "returned": returned,
+            "sum_summary": sum_summary,
+            "sum_returned": sum_returned,
+            "sum_with_returned": sum_summary - sum_returned,
             "products_summary": products_summary,
             "clients_summary": clients_summary,
+            "returned_create_form": ReturnedCreateForm(),
+            "returned_create_url": reverse("invoice:returned_create"),
         }
         return render(request, self.template_name, context)
 
@@ -171,13 +183,37 @@ class ReleasedDetailView(generic.DetailView):
         return HttpResponse("OK")
 
 
-class InvoiceEditForm(generic.UpdateView):
+class InvoiceEditFormView(generic.UpdateView):
     model = Invoice
     fields = ["number", "date", "client"]
     template_name_suffix = "EditForm"
 
 
-class ReleasedEditForm(generic.UpdateView):
+class ReleasedEditFormView(generic.UpdateView):
     model = Released
     fields = ["product", "qty", "discount"]
     template_name_suffix = "EditForm"
+
+
+class ReturnedCreateForm(forms.ModelForm):
+    class Meta:
+        model = Returned
+        fields = ['product', 'qty', 'discount', 'date']
+
+
+class ReturnedCreateFormView(generic.CreateView):
+    model = Returned
+    fields = ['product', 'qty', 'discount', 'date']
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(reverse("invoice:index"))
+
+
+class ReturnedDetailView(generic.DetailView):
+    model = Returned
+    template_name = "invoice/returned.html"
+
+    def delete(self, request, pk):
+        returned = get_object_or_404(Returned, pk=pk)
+        returned.delete()
+        return HttpResponse("OK")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-22 19:30+0300\n"
+"POT-Creation-Date: 2019-06-23 13:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,19 +60,23 @@ msgstr "Дата"
 msgid "invoice_client"
 msgstr "Покупатель"
 
-#: invoice/models.py:33
-msgid "invoice_created_at"
+#: invoice/models.py:33 invoice/models.py:48 invoice/models.py:68
+#, fuzzy
+#| msgid "invoice_created_at"
+msgid "created_at"
 msgstr "Дата создания"
 
-#: invoice/models.py:34
-msgid "invoice_updated_at"
+#: invoice/models.py:34 invoice/models.py:49 invoice/models.py:69
+#, fuzzy
+#| msgid "invoice_updated_at"
+msgid "updated_at"
 msgstr "Дата обновления"
 
 #: invoice/models.py:44
 msgid "released_invoice"
 msgstr "Накладная"
 
-#: invoice/models.py:45
+#: invoice/models.py:45 invoice/models.py:64
 msgid "released_product"
 msgstr "Товар"
 
@@ -84,10 +88,20 @@ msgstr "Количество"
 msgid "released_discount"
 msgstr "Скидка"
 
-#: invoice/models.py:48
-msgid "released_created_at"
-msgstr "Дата создания"
+#: invoice/models.py:65
+msgid "returned_qty"
+msgstr "Количество"
 
-#: invoice/models.py:49
-msgid "released_updated_at"
-msgstr "Дата обновления"
+#: invoice/models.py:66
+msgid "returned_discount"
+msgstr "Скидка"
+
+#: invoice/models.py:67
+msgid "returned_date"
+msgstr "Дата возврата"
+
+#~ msgid "released_created_at"
+#~ msgstr "Дата создания"
+
+#~ msgid "released_updated_at"
+#~ msgstr "Дата обновления"

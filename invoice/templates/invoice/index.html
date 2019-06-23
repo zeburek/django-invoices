@@ -16,11 +16,23 @@
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <div class="accordion my-2 w-50 mx-auto border-bottom" id="accordionAdding">
-        {% include "invoice/components/addingInvoiceForm.html" %}
+    <div class="row">
+        <div class="col-md-3">
+            <ul>
+                <li>Общая сумма: {{ sum_summary }}</li>
+                <li>Сумма возвратов {{ sum_returned }}</li>
+                <li>Итог: {{ sum_with_returned }}</li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <div class="accordion my-2 w-75 mx-auto" id="accordionAdding">
+                {% include "invoice/components/addingInvoiceForm.html" %}
+                {% include "invoice/components/basicAccordionForm.html" with form=returned_create_form submit_text="Создать" collapse_name="createReturned" form_name="Добавить возврат" url=returned_create_url %}
+            </div>
+        </div>
     </div>
 
-    <p>Общая сумма: {{ sum_summary }}</p>
+
 
     <ul class="nav nav-tabs" id="mainPageTabs" role="tablist">
       <li class="nav-item">
@@ -31,6 +43,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" id="clients-tab" data-toggle="tab" href="#clients" role="tab" aria-controls="contact" aria-selected="false">Клиенты</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="returned-tab" data-toggle="tab" href="#returned" role="tab" aria-controls="returned" aria-selected="false">Возвраты</a>
       </li>
     </ul>
 
@@ -103,6 +118,39 @@
                     <td>{{ client.sum_summary }}</td>
                     <td>{{ client.sum_invoices }}</td>
                 </tr>
+        {% endfor %}
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
+            <table class="table table-sm table-bordered table-hover">
+                <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Наименование</th>
+                    <th>Дата</th>
+                    <th>Кол-во</th>
+                    <th>Сумма</th>
+                    <th>Действие</th>
+                </tr>
+                </thead>
+
+        {% for return in returned %}
+                <tr>
+                    {% include "invoice/components/deleteReturnedModal.html" with returned=return %}
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ return.product }}</td>
+                    <td>{{ return.date }}</td>
+                    <td>{{ return.qty }}</td>
+                    <td>{{ return.summary }}</td>
+                    <td>
+                        <a href="#" data-toggle="modal" data-target="#deleteReturnedModal{{ return.id }}">
+                            <i class="far fa-times-circle float-right text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+        {% empty %}
+                <tr><td colspan="6">Недостаточно информации</td></tr>
         {% endfor %}
             </table>
         </div>

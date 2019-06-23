@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Возврат:</h1>
+    <p>
+        <br />Наименование: {{ returned.product.name }}
+        <br />Дата: {{ returned.date }}
+        <br />Количество: {{ returned.qty }}
+        <br />Скидка: {{ returned.discount }}
+        <br />Сумма: {{ returned.summary }}
+    </p>
+
+{% endblock %}
