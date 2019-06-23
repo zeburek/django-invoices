@@ -7,6 +7,9 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 run: .load-venv
 	python manage.py runserver
 
+test: .load-venv
+	python manage.py test
+
 migrate: .load-venv
 	python manage.py migrate
 
