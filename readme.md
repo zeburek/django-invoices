@@ -32,7 +32,7 @@ Uses:
 
 # ToDo's
 
-* Add returns
 * Add authentication
+* Add in stock products information
 * Pack product into executables
 * ...
