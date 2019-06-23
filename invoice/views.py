@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -7,7 +8,9 @@ from django.views import generic
 from .models import Client, Invoice, Product, Released, Returned
 
 
-class IndexView(generic.View):
+class IndexView(LoginRequiredMixin, generic.View):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
 
     template_name = "invoice/index.html"
 
@@ -117,7 +120,9 @@ class IndexView(generic.View):
             )
 
 
-class InvoiceDetailView(generic.DetailView):
+class InvoiceDetailView(LoginRequiredMixin, generic.DetailView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Invoice
     template_name = "invoice/detail.html"
 
@@ -191,7 +196,9 @@ class InvoiceDetailView(generic.DetailView):
         return HttpResponse("OK")
 
 
-class ReleasedDetailView(generic.DetailView):
+class ReleasedDetailView(LoginRequiredMixin, generic.DetailView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Released
     template_name = "invoice/released.html"
 
@@ -201,13 +208,17 @@ class ReleasedDetailView(generic.DetailView):
         return HttpResponse("OK")
 
 
-class InvoiceEditFormView(generic.UpdateView):
+class InvoiceEditFormView(LoginRequiredMixin, generic.UpdateView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Invoice
     fields = ["number", "date", "client"]
     template_name_suffix = "EditForm"
 
 
-class ReleasedEditFormView(generic.UpdateView):
+class ReleasedEditFormView(LoginRequiredMixin, generic.UpdateView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Released
     fields = ["product", "qty", "discount"]
     template_name_suffix = "EditForm"
@@ -219,7 +230,9 @@ class ReturnedCreateForm(forms.ModelForm):
         fields = ['product', 'qty', 'discount', 'date', 'client']
 
 
-class ReturnedCreateFormView(generic.CreateView):
+class ReturnedCreateFormView(LoginRequiredMixin, generic.CreateView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Returned
     fields = ['product', 'qty', 'discount', 'date', 'client']
 
@@ -227,7 +240,9 @@ class ReturnedCreateFormView(generic.CreateView):
         return HttpResponseRedirect(reverse("invoice:index"))
 
 
-class ReturnedDetailView(generic.DetailView):
+class ReturnedDetailView(LoginRequiredMixin, generic.DetailView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
     model = Returned
     template_name = "invoice/returned.html"
 
