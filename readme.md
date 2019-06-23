@@ -24,15 +24,24 @@ Uses:
     python manage.py migrate
     ```
 
+2. Create super user
+
+    ```bash
+    python manage.py createsuperuser
+    ```
+
 3. Start server
 
     ```bash
     python manage.py runserver
     ```
+    
+Now you can authorize as an superuser and manage your information.
+
+To add Products and Clients you should open admin panel and add them there.
 
 # ToDo's
 
-* Add authentication
 * Add in stock products information
 * Pack product into executables
 * ...
