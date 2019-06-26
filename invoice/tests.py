@@ -20,17 +20,19 @@ class ClientTestCase(TestCase):
 
     def test_client_string_representation(self):
         client = Client.objects.get(name="Test name 1")
-        self.assertEquals(
-            str(client), f"{client.name}"
-        )
+        self.assertEquals(str(client), f"{client.name}")
 
 
 class ReleasedTestCase(TestCase):
     def setUp(self) -> None:
         client = Client.objects.create(name="Test")
         product = Product.objects.create(name="Test", price=160)
-        invoice = Invoice.objects.create(client_id=client.id, date="2019-06-21", number=10)
-        Released.objects.create(invoice_id=invoice.id, product_id=product.id, qty=10, discount=15)
+        invoice = Invoice.objects.create(
+            client_id=client.id, date="2019-06-21", number=10
+        )
+        Released.objects.create(
+            invoice_id=invoice.id, product_id=product.id, qty=10, discount=15
+        )
 
     def test_client_string_representation(self):
         invoice = Invoice.objects.get(number=10)
