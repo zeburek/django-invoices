@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("product_name"))
-    price = models.IntegerField(verbose_name=_("product_price"))
+    price = models.FloatField(verbose_name=_("product_price"))
 
     class Meta:
         verbose_name = _("product_model")
@@ -38,6 +38,18 @@ class Invoice(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True, verbose_name=_("updated_at")
     )
+
+    @property
+    def released(self):
+        return Released.objects.filter(invoice_id=self.id)
+
+    @property
+    def summary(self):
+        return sum([i.summary for i in self.released])
+
+    @property
+    def qty(self):
+        return sum([i.qty for i in self.released])
 
     def __str__(self):
         return f"{self.number} от {self.date} для {self.client}"

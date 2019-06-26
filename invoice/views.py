@@ -1,4 +1,14 @@
 from django import forms
+from django.db.models import (
+    ExpressionWrapper,
+    F,
+    FloatField,
+    OuterRef,
+    Subquery,
+    Sum,
+    Value,
+)
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -11,6 +21,12 @@ class IndexView(generic.View):
 
     template_name = "invoice/index.html"
 
+    _count_summary = ExpressionWrapper(
+        F("product__price") * F("qty")
+        - F("product__price") * F("qty") / 100 * F("discount"),
+        output_field=FloatField(),
+    )
+
     def get(self, request):
         year = request.GET.get("filter_year")
         month = request.GET.get("filter_month")
@@ -20,60 +36,77 @@ class IndexView(generic.View):
             ).order_by("-created_at")
             returned = Returned.objects.filter(
                 date__year=year, date__month=month
-            ).order_by("-created_at")
+            ).all()
         else:
             invoices = Invoice.objects.order_by("-created_at")
-            returned = Returned.objects.order_by("-created_at")
-        clients = Client.objects.order_by("name")
-        products = Product.objects.order_by("name")
-        all_released = []
-        for invoice in invoices:
-            released = Released.objects.filter(invoice=invoice.id)
-            all_released.extend(released)
-            invoice.sum_qty = sum([i.qty for i in released])
-            invoice.sum_summary = sum([i.summary for i in released])
-        products_summary = []
-        for product in products:
-            filtered = [
-                rel for rel in all_released if rel.product.name == product.name
-            ]
-            returns = returned.filter(product_id=product.id)
-            sum_summary = sum([i.summary for i in filtered])
-            sum_returned = sum([i.summary for i in returns])
-            sum_qty = sum([i.qty for i in filtered])
-            sum_returned_qty = sum([i.qty for i in returns])
-            data = {
-                "name": product.name,
-                "sum_summary": sum_summary,
-                "sum_returned": sum_returned,
-                "sum_with_returned": sum_summary - sum_returned,
-                "sum_qty": sum_qty,
-                "sum_returned_qty": sum_returned_qty,
-                "sum_with_returned_qty": sum_qty - sum_returned_qty,
-            }
-            products_summary.append(data)
-        clients_summary = []
-        for client in clients:
-            filtered = [
-                inv for inv in invoices if inv.client.name == client.name
-            ]
-            returns = returned.filter(client_id=client.id)
-            sum_summary = sum([i.sum_summary for i in filtered])
-            sum_returned = sum([i.summary for i in returns])
-            sum_qty = sum([i.sum_qty for i in filtered])
-            sum_returned_qty = sum([i.qty for i in returns])
-            data = {
-                "name": client.name,
-                "sum_summary": sum_summary,
-                "sum_returned": sum_returned,
-                "sum_with_returned": sum_summary - sum_returned,
-                "sum_qty": sum_qty,
-                "sum_returned_qty": sum_returned_qty,
-                "sum_with_returned_qty": sum_qty - sum_returned_qty,
-                "sum_invoices": len(filtered),
-            }
-            clients_summary.append(data)
-        sum_summary = sum([i.sum_summary for i in invoices])
+            returned = Returned.objects.all()
+        returned_subquery = (
+            returned.filter(product=OuterRef("pk"))
+            .values("product_id")
+            .annotate(
+                sum_returned_qty=Sum("qty"),
+                sum_returned=Sum(self._count_summary),
+            )
+        )
+        released_subquery = (
+            Released.objects.filter(
+                product=OuterRef("pk"), invoice__in=invoices
+            )
+            .values("product_id")
+            .annotate(sum_qty=Sum("qty"), sum_summary=Sum(self._count_summary))
+        )
+        products = Product.objects.annotate(
+            sum_qty=Coalesce(
+                Subquery(released_subquery.values("sum_qty")), Value(0)
+            ),
+            sum_summary=Coalesce(
+                Subquery(released_subquery.values("sum_summary")), Value(0)
+            ),
+            sum_returned_qty=Coalesce(
+                Subquery(returned_subquery.values("sum_returned_qty")),
+                Value(0),
+            ),
+            sum_returned=Coalesce(
+                Subquery(returned_subquery.values("sum_returned")), Value(0)
+            ),
+            sum_with_returned=F("sum_summary") - F("sum_returned"),
+            sum_with_returned_qty=F("sum_qty") - F("sum_returned_qty"),
+        ).order_by("name")
+
+        returned_subquery = (
+            returned.filter(client=OuterRef("pk"))
+            .values("client_id")
+            .annotate(
+                sum_returned_qty=Sum("qty"),
+                sum_returned=Sum(self._count_summary),
+            )
+        )
+        released_subquery = (
+            Released.objects.filter(
+                invoice__client=OuterRef("pk"), invoice__in=invoices
+            )
+            .values("invoice__client__id")
+            .annotate(sum_qty=Sum("qty"), sum_summary=Sum(self._count_summary))
+        )
+        clients = Client.objects.annotate(
+            sum_qty=Coalesce(
+                Subquery(released_subquery.values("sum_qty")), Value(0)
+            ),
+            sum_summary=Coalesce(
+                Subquery(released_subquery.values("sum_summary")), Value(0)
+            ),
+            sum_returned_qty=Coalesce(
+                Subquery(returned_subquery.values("sum_returned_qty")),
+                Value(0),
+            ),
+            sum_returned=Coalesce(
+                Subquery(returned_subquery.values("sum_returned")), Value(0)
+            ),
+            sum_with_returned=F("sum_summary") - F("sum_returned"),
+            sum_with_returned_qty=F("sum_qty") - F("sum_returned_qty"),
+            sum_invoices=Coalesce(Sum("invoice"), Value(0)),
+        ).order_by("name")
+        sum_summary = sum([i.summary for i in invoices])
         sum_returned = sum([i.summary for i in returned])
         context = {
             "invoices": invoices,
@@ -82,8 +115,7 @@ class IndexView(generic.View):
             "sum_summary": sum_summary,
             "sum_returned": sum_returned,
             "sum_with_returned": sum_summary - sum_returned,
-            "products_summary": products_summary,
-            "clients_summary": clients_summary,
+            "products_summary": products,
             "returned_create_form": ReturnedCreateForm(),
             "returned_create_url": reverse("invoice:returned_create"),
         }
