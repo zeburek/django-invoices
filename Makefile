@@ -28,3 +28,6 @@ compile-messages: .load-venv
 		python ../manage.py compilemessages -l=en -l=ru --settings=invoices.settings; \
 		cd ../; \
 	)
+
+shell: .load-venv
+	python manage.py shell -i ipython
