@@ -12,6 +12,7 @@ from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views import generic
 
 from .models import Client, Invoice, Product, Released, Returned
@@ -26,6 +27,29 @@ class IndexView(generic.View):
         - F("product__price") * F("qty") / 100 * F("discount"),
         output_field=FloatField(),
     )
+    _invoices_sorting = ["number", "date", "created_at"]
+
+    def _add_invoice_sorting(self, request, invoices):
+        sorting = request.GET.get("sort_invoices", "-created_at")
+        return invoices.order_by(sorting)
+
+    def _generate_sorting_list(self, fields: list):
+        data = []
+        for field in fields:
+            f = Invoice._meta.get_field(field)
+            name = f.name
+            vn = f.verbose_name
+            data.append(
+                {"value": name, "text": vn, "add_text": _("sorting_asc")}
+            )
+            data.append(
+                {
+                    "value": "-" + name,
+                    "text": vn,
+                    "add_text": _("sorting_desc"),
+                }
+            )
+        return data
 
     def get(self, request):
         year = request.GET.get("filter_year")
@@ -33,13 +57,14 @@ class IndexView(generic.View):
         if year and month:
             invoices = Invoice.objects.filter(
                 date__year=year, date__month=month
-            ).order_by("-created_at")
+            ).all()
             returned = Returned.objects.filter(
                 date__year=year, date__month=month
             ).all()
         else:
-            invoices = Invoice.objects.order_by("-created_at")
+            invoices = Invoice.objects.all()
             returned = Returned.objects.all()
+        invoices = self._add_invoice_sorting(request, invoices)
         returned_subquery = (
             returned.filter(product=OuterRef("pk"))
             .values("product_id")
@@ -118,6 +143,9 @@ class IndexView(generic.View):
             "products_summary": products,
             "returned_create_form": ReturnedCreateForm(),
             "returned_create_url": reverse("invoice:returned_create"),
+            "invoice_sort_fields": self._generate_sorting_list(
+                self._invoices_sorting
+            ),
         }
         return render(request, self.template_name, context)
 
