@@ -56,28 +56,45 @@
     <div class="tab-content p-2 border-left border-right border-bottom" id="mainPageTabsContent">
 
         <div class="tab-pane fade show active" id="main-list" role="tabpanel" aria-labelledby="main-list-tab">
-            <div class="list-group">
-            {% for invoice in invoices %}
 
+            <table class="table table-sm table-bordered table-hover">
+                <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Номер накладной</th>
+                    <th>Дата</th>
+                    <th>Клиент</th>
+                    <th>Кол-во</th>
+                    <th>Сумма</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+        {% for invoice in invoices %}
+                <tr>
                 {% include "invoice/components/deleteInvoiceModal.html" with invoice=invoice %}
-                <div class="list-group-item list-group-item-action">
-                    <div class="d-flex w-100">
-                        <a href="{% url 'invoice:details' invoice.id %}" class="mr-auto">
-                            <h5 class="mb-0">Накладная {{ invoice.number }}</h5>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{% url 'invoice:details' invoice.id %}">
+                            Накладная {{ invoice.number }}
                         </a>
-                        <small class="float-right mr-2">От {{ invoice.date }}</small>
-                        <a href="{% url 'invoice:edit_invoice' invoice.id %}"><i class="fas fa-pen float-right text-warning"></i></a>
-                        <a href="#" data-toggle="modal" data-target="#deleteInvoiceModal{{ invoice.id }}"><i class="far fa-times-circle float-right text-danger"></i></a>
-                    </div>
-                    <div class="d-flex w-100 justify-content-between">
-                        <p class="mb-0">Кол-во: {{ invoice.qty }}, Сумма: {{ invoice.summary }}</p>
-                        <small>Для {{ invoice.client }}</small>
-                    </div>
-                </div>
-            {% empty %}
-            Нет добавленных накладных.
-            {% endfor %}
-            </div>
+                    </td>
+                    <td>{{ invoice.date }}</td>
+                    <td>{{ invoice.client }}</td>
+                    <td>{{ invoice.qty }}</td>
+                    <td>{{ invoice.summary }}</td>
+                    <td>
+                        <a href="{% url 'invoice:edit_invoice' invoice.id %}">
+                            <i class="fas fa-pen text-warning"></i>
+                        </a>
+                        <a href="#" data-toggle="modal" data-target="#deleteInvoiceModal{{ invoice.id }}">
+                            <i class="far fa-times-circle text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+        {% empty %}
+                <tr><td colspan="8">Недостаточно информации</td></tr>
+        {% endfor %}
+            </table>
         </div>
         <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
             <table class="table table-sm table-bordered table-hover">
