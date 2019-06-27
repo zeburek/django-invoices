@@ -37,10 +37,10 @@
             });
 
             function delete_invoice(id) {
-                var url = "{% url 'invoice:index' %}";
+                var url = "{% url 'invoice:details' 0 %}".replace("0", id);
 
                 $.ajax({
-                    url: url+id,
+                    url: url,
                     type: 'DELETE',
                     success: function(result) {
                         window.location.href = "{% url 'invoice:index' %}";
@@ -49,10 +49,10 @@
             }
 
             function delete_returned(id) {
-                var url = "{% url 'invoice:returned_create' %}";
+                var url = "{% url 'invoice:returned_details' 0 %}".replace("0", id);
 
                 $.ajax({
-                    url: url+id,
+                    url: url,
                     type: 'DELETE',
                     success: function(result) {
                         window.location.href = "{% url 'invoice:index' %}";
@@ -61,10 +61,10 @@
             }
 
             function delete_released(id, invoice_id) {
-                var url = "/released/";
+                var url = "{% url 'invoice:released_details' 0 %}".replace("0", id);
 
                 $.ajax({
-                    url: url+id,
+                    url: url,
                     type: 'DELETE',
                     success: function(result) {
                         window.location.href = "{% url 'invoice:index' %}" + invoice_id;
