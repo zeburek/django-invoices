@@ -6,8 +6,12 @@
 <form class="form-inline my-2 my-lg-0 float-right">
         <small class="mr-2" id="filter-addon">Фильтр</small>
         <input class="form-control form-control-sm" aria-describedby="filter-addon" type="month" id="filter_month" placeholder="Месяц" style="width:150px;"/>
-        <button class="btn btn-sm btn-outline-success" onclick="set_query_params()" type="button">Применить</button>
-        <button class="btn btn-sm btn-outline-warning" onclick="clear_params()" type="button">Очистить</button>
+        <button class="btn btn-sm btn-outline-success" onclick="set_query_params()" type="button">
+            <i class="fas fa-check"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-warning" onclick="clear_params()" type="button">
+            <i class="fas fa-times-circle"></i>
+        </button>
 </form>
 
 {% endblock navbar_addition %}
