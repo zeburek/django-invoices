@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<form class="form-inline mx-2 mb-2" method="get">
+  <div class="form-group">
+    <label class="mr-2" for="{{ sort_name }}">Сортировка</label>
+    <select class="form-control mr-2" id="{{ sort_name }}" name="{{ sort_name }}">
+        {% for elem in data %}
+            <option value="{{ elem.value }}">{% trans elem.text %} {{ elem.add_text }}</option>
+        {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Применить</button>
+</form>
