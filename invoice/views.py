@@ -7,7 +7,7 @@ from django.db.models import (
     Subquery,
     Sum,
     Value,
-)
+    Count)
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -129,7 +129,7 @@ class IndexView(generic.View):
             ),
             sum_with_returned=F("sum_summary") - F("sum_returned"),
             sum_with_returned_qty=F("sum_qty") - F("sum_returned_qty"),
-            sum_invoices=Coalesce(Sum("invoice"), Value(0)),
+            sum_invoices=Coalesce(Count("invoice"), Value(0)),
         ).order_by("name")
         sum_summary = sum([i.summary for i in invoices])
         sum_returned = sum([i.summary for i in returned])
