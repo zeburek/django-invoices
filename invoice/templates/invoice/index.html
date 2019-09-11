@@ -106,10 +106,10 @@
                     <th>Наименование</th>
                     <th>Кол-во</th>
                     <th>Сумма</th>
-                    <th>Возврат кол-во</th>
-                    <th>Возврат сумма</th>
-                    <th>Итог кол-во</th>
-                    <th>Итог сумма</th>
+{#                    <th>Возврат кол-во</th>#}
+{#                    <th>Возврат сумма</th>#}
+{#                    <th>Итог кол-во</th>#}
+{#                    <th>Итог сумма</th>#}
                 </tr>
                 </thead>
         {% for product in products_summary %}
@@ -118,10 +118,10 @@
                     <td>{{ product.name }}</td>
                     <td>{{ product.sum_qty }}</td>
                     <td>{{ product.sum_summary }}</td>
-                    <td>{{ product.sum_returned_qty }}</td>
-                    <td>{{ product.sum_returned }}</td>
-                    <td>{{ product.sum_with_returned_qty }}</td>
-                    <td>{{ product.sum_with_returned }}</td>
+{#                    <td>{{ product.sum_returned_qty }}</td>#}
+{#                    <td>{{ product.sum_returned }}</td>#}
+{#                    <td>{{ product.sum_with_returned_qty }}</td>#}
+{#                    <td>{{ product.sum_with_returned }}</td>#}
                 </tr>
         {% empty %}
                 <tr><td colspan="8">Недостаточно информации</td></tr>
@@ -136,12 +136,12 @@
                     <th>№</th>
                     <th>Клиент</th>
                     <th>Количество накладных</th>
-                    <th>Кол-во</th>
+                    <th>Кол-во товара</th>
                     <th>Сумма</th>
-                    <th>Возврат кол-во</th>
-                    <th>Возврат сумма</th>
-                    <th>Итог кол-во</th>
-                    <th>Итог сумма</th>
+{#                    <th>Возврат кол-во</th>#}
+{#                    <th>Возврат сумма</th>#}
+{#                    <th>Итог кол-во</th>#}
+{#                    <th>Итог сумма</th>#}
                 </tr>
                 </thead>
 
@@ -152,10 +152,10 @@
                     <td>{{ client.sum_invoices }}</td>
                     <td>{{ client.sum_qty }}</td>
                     <td>{{ client.sum_summary }}</td>
-                    <td>{{ client.sum_returned_qty }}</td>
-                    <td>{{ client.sum_returned }}</td>
-                    <td>{{ client.sum_with_returned_qty }}</td>
-                    <td>{{ client.sum_with_returned }}</td>
+{#                    <td>{{ client.sum_returned_qty }}</td>#}
+{#                    <td>{{ client.sum_returned }}</td>#}
+{#                    <td>{{ client.sum_with_returned_qty }}</td>#}
+{#                    <td>{{ client.sum_with_returned }}</td>#}
                 </tr>
         {% endfor %}
             </table>

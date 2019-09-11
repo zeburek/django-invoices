@@ -1,4 +1,5 @@
 from django import forms
+from django.core import serializers
 from django.db.models import (
     ExpressionWrapper,
     F,
@@ -7,7 +8,8 @@ from django.db.models import (
     Subquery,
     Sum,
     Value,
-    Count)
+    Count,
+)
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -57,16 +59,16 @@ class IndexView(generic.View):
         if year and month:
             invoices = Invoice.objects.filter(
                 date__year=year, date__month=month
-            ).all()
+            )
             returned = Returned.objects.filter(
                 date__year=year, date__month=month
-            ).all()
+            )
         else:
             invoices = Invoice.objects.all()
             returned = Returned.objects.all()
         invoices = self._add_invoice_sorting(request, invoices)
         returned_subquery = (
-            returned.filter(product=OuterRef("pk"))
+            Returned.objects.filter(product=OuterRef("pk"))
             .values("product_id")
             .annotate(
                 sum_returned_qty=Sum("qty"),
@@ -99,7 +101,7 @@ class IndexView(generic.View):
         ).order_by("name")
 
         returned_subquery = (
-            returned.filter(client=OuterRef("pk"))
+            Returned.objects.filter(client=OuterRef("pk"))
             .values("client_id")
             .annotate(
                 sum_returned_qty=Sum("qty"),
